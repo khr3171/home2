@@ -42,3 +42,14 @@
   .hero-art { width: 100%; height: auto; left: auto; }
   .hero-bottom { padding: 14px 18px; }
 }
+/* Main composition v3: compact spacing and uncropped, texture-free illustration. */
+.hero-copy { padding-top: 36px; }
+.hero .eyebrow { margin-bottom: 18px; }
+.hero h1 { font-size: clamp(3rem, 5vw, 4.2rem); margin-bottom: 22px; }
+.hero .lead { margin-bottom: 20px; }
+.hero-credit { margin-top: 18px; }
+.hero-art { aspect-ratio: 1400 / 520; }
+@media (max-width:760px) {
+ .hero-copy { padding-top: 30px; padding-bottom: 16px; }
+ .hero h1, .large .hero h1 { font-size: clamp(2.15rem,9vw,3.25rem); }
+}
