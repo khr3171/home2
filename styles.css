@@ -53,3 +53,5 @@
  .hero-copy { padding-top: 30px; padding-bottom: 16px; }
  .hero h1, .large .hero h1 { font-size: clamp(2.15rem,9vw,3.25rem); }
 }
+
+.visibility{border:1px solid var(--line);border-radius:8px;padding:15px;margin:20px 0}.visibility legend{font-size:.9rem;font-weight:700}.visibility label{display:flex;gap:10px;align-items:flex-start;font-weight:400}.visibility input[type=radio]{width:22px;height:22px;flex-shrink:0;accent-color:var(--green);margin-top:3px;padding:0}.question .pill{margin:0 8px 8px 0} .admin-item .button{margin:8px 0}

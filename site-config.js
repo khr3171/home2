@@ -5,5 +5,5 @@ window.SITE_CONFIG = {
   ],
   // Firebase Console > 프로젝트 설정 > 내 앱의 웹 구성값을 입력한 뒤 enabled를 true로 바꾸세요.
   // 관리자 SDK 비밀키는 절대 넣지 마세요. 상세 설정은 README.md를 확인하세요.
-  firebase: { enabled: false, apiKey: '', authDomain: '', projectId: '', storageBucket: '', messagingSenderId: '', appId: '' }
+  firebase: { enabled: false, databaseURL: 'https://home2-87a22-default-rtdb.firebaseio.com/', apiKey: '', authDomain: '', projectId: '', storageBucket: '', messagingSenderId: '', appId: '' }
 };

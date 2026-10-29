@@ -1,0 +1,95 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "questions": {
+      ".indexOn": [
+        "uid",
+        "visibility"
+      ],
+      ".read": "(auth != null && auth.token.admin === true) || (query.orderByChild === 'visibility' && query.equalTo === 'public') || (auth != null && query.orderByChild === 'uid' && query.equalTo === auth.uid)",
+      "$questionId": {
+        ".read": "data.child('visibility').val() === 'public' || (auth != null && (data.child('uid').val() === auth.uid || auth.token.admin === true))",
+        ".write": "auth != null && ((!data.exists() && newData.exists() && newData.child('uid').val() === auth.uid && !newData.child('answer').exists() && !newData.child('answeredAt').exists()) || (data.exists() && newData.exists() && auth.token.admin === true))",
+        ".validate": "newData.hasChildren(['uid','title','body','visibility','createdAt']) && (!data.exists() || (newData.child('uid').val() === data.child('uid').val() && newData.child('title').val() === data.child('title').val() && newData.child('body').val() === data.child('body').val() && newData.child('visibility').val() === data.child('visibility').val() && newData.child('createdAt').val() === data.child('createdAt').val())) && (newData.child('answer').exists() === newData.child('answeredAt').exists())",
+        "uid": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "title": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80"
+        },
+        "body": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"
+        },
+        "visibility": {
+          ".validate": "newData.val() === 'public' || newData.val() === 'private'"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() === now)"
+        },
+        "answer": {
+          ".validate": "auth.token.admin === true && newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"
+        },
+        "answeredAt": {
+          ".validate": "auth.token.admin === true && newData.isNumber() && newData.val() === now"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "galleryMeta": {
+      ".read": true,
+      ".indexOn": [
+        "createdAt"
+      ],
+      "$slot": {
+        ".write": "$slot.matches(/^p[0-9][0-9]$/) && auth != null && ((!data.exists() && newData.exists() && newData.child('uid').val() === auth.uid && newData.parent().parent().child('galleryImages').child($slot).exists()) || (data.exists() && !newData.exists() && auth.token.admin === true && newData.parent().parent().child('galleryDeleteTokens').child($slot).val() === data.child('uploadId').val() && !newData.parent().parent().child('galleryImages').child($slot).exists()))",
+        ".validate": "newData.hasChildren(['uid','title','createdAt','uploadId']) && newData.child('uid').val() === newData.parent().parent().child('galleryImages').child($slot).child('uid').val() && newData.child('uploadId').val() === newData.parent().parent().child('galleryImages').child($slot).child('uploadId').val()",
+        "uid": {
+          ".validate": "newData.isString() && newData.val() === auth.uid"
+        },
+        "uploadId": {
+          ".validate": "newData.isString() && newData.val().length === 36"
+        },
+        "title": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && newData.val() === now"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "galleryImages": {
+      "$slot": {
+        ".read": "$slot.matches(/^p[0-9][0-9]$/)",
+        ".write": "$slot.matches(/^p[0-9][0-9]$/) && auth != null && ((!data.exists() && newData.exists() && newData.child('uid').val() === auth.uid && newData.parent().parent().child('galleryMeta').child($slot).exists()) || (data.exists() && !newData.exists() && auth.token.admin === true && newData.parent().parent().child('galleryDeleteTokens').child($slot).val() === data.child('uploadId').val() && !newData.parent().parent().child('galleryMeta').child($slot).exists()))",
+        ".validate": "newData.hasChildren(['uid','uploadId','mime','base64']) && newData.child('uid').val() === newData.parent().parent().child('galleryMeta').child($slot).child('uid').val() && newData.child('uploadId').val() === newData.parent().parent().child('galleryMeta').child($slot).child('uploadId').val()",
+        "uid": {
+          ".validate": "newData.isString() && newData.val() === auth.uid"
+        },
+        "uploadId": {
+          ".validate": "newData.isString() && newData.val().length === 36"
+        },
+        "mime": {
+          ".validate": "newData.val() === 'image/webp' || newData.val() === 'image/jpeg'"
+        },
+        "base64": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 136532 && newData.val().matches(/^[A-Za-z0-9+\\/]*={0,2}$/)"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "galleryDeleteTokens": {
+      "$slot": {
+        ".write": "$slot.matches(/^p[0-9][0-9]$/) && auth != null && auth.token.admin === true && newData.isString() && newData.val() === root.child('galleryMeta').child($slot).child('uploadId').val() && !newData.parent().parent().child('galleryMeta').child($slot).exists() && !newData.parent().parent().child('galleryImages').child($slot).exists()",
+        ".validate": "newData.isString() && newData.val().length === 36"
+      }
+    }
+  }
+}
