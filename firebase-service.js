@@ -1,7 +1,7 @@
 // Firebase Spark only: Authentication + Realtime Database. No Storage SDK.
 const MAX_BYTES = 102399; // Safely below 100 KiB, including base64 padding constraints.
 export function createRepository(sdk, database, currentUser) {
-  const ref = path => sdk.ref(database(), path);
+  const ref = path => path === undefined ? sdk.ref(database()) : sdk.ref(database(), path);
   const rows = snapshot => { const list=[];snapshot.forEach(s=>list.push({...s.val(),id:s.key}));return list.sort((a,b)=>(b.createdAt-a.createdAt)||b.id.localeCompare(a.id)); };
   const read = async q => rows(await sdk.get(q));
   return {
@@ -34,7 +34,7 @@ export function createRepository(sdk, database, currentUser) {
         const payload={};
         payload[`galleryMeta/${slot}`]={uid:user.uid,title,createdAt:sdk.serverTimestamp(),uploadId};
         payload[`galleryImages/${slot}`]={uid:user.uid,uploadId,mime:file.type,base64};
-        try {await sdk.update(ref(''),payload);return;}
+        try {await sdk.update(ref(),payload);return;}
         catch(error) {
           if(!String(error.code).toLowerCase().includes('permission'))throw error;
           // Another writer may have won the same slot. Never overwrite that photo.
@@ -50,7 +50,7 @@ export function createRepository(sdk, database, currentUser) {
       const latest=(await sdk.get(ref(`galleryMeta/${photo.id}`))).val();
       if(!latest)return;
       if(latest.uploadId!==photo.uploadId)throw new Error('사진이 바뀌었어요. 목록을 새로고침해 주세요.');
-      await sdk.update(ref(''),{[`galleryMeta/${photo.id}`]:null,[`galleryImages/${photo.id}`]:null,[`galleryDeleteTokens/${photo.id}`]:photo.uploadId});
+      await sdk.update(ref(),{[`galleryMeta/${photo.id}`]:null,[`galleryImages/${photo.id}`]:null,[`galleryDeleteTokens/${photo.id}`]:photo.uploadId});
     },
     ask:({title,body,uid,visibility='public'})=>sdk.set(sdk.push(ref('questions')),{uid,title,body,visibility,createdAt:sdk.serverTimestamp()}),
     reply:(id,answer)=>sdk.update(ref(`questions/${id}`),{answer,answeredAt:sdk.serverTimestamp()})
