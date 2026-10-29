@@ -34,14 +34,27 @@ export function createRepository(sdk, database, currentUser) {
         const payload={};
         payload[`galleryMeta/${slot}`]={uid:user.uid,title,createdAt:sdk.serverTimestamp(),uploadId};
         payload[`galleryImages/${slot}`]={uid:user.uid,uploadId,mime:file.type,base64};
-        try {await sdk.update(ref(),payload);return;}
+        try {
+          await sdk.update(ref(),payload);
+        }
         catch(error) {
           if(!String(error.code).toLowerCase().includes('permission'))throw error;
           // Another writer may have won the same slot. Never overwrite that photo.
           const winner=(await sdk.get(ref(`galleryMeta/${slot}`))).val();
           if(!winner)throw error;
           occupied[slot]=winner;
+          continue;
         }
+        // A successful write acknowledgement alone does not prove the gallery
+        // can read the new record. Verify both halves before reporting success.
+        const [metaSnap,imageSnap]=await Promise.all([
+          sdk.get(ref(`galleryMeta/${slot}`)),sdk.get(ref(`galleryImages/${slot}`))
+        ]);
+        const saved=metaSnap.val(),image=imageSnap.val();
+        if(!saved||!image||saved.uploadId!==uploadId||image.uploadId!==uploadId){
+          throw Object.assign(new Error('사진 저장 결과를 확인하지 못했어요. 목록을 다시 불러와 주세요.'),{code:'upload-not-confirmed'});
+        }
+        return {...saved,id:slot};
       }
       throw new Error('사진 등록이 몰리고 있어요. 잠시 후 다시 시도해 주세요.');
     },
