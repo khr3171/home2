@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+ match /b/{bucket}/o {
+  function admin() { return request.auth != null && request.auth.token.admin == true; }
+  match /photos/{uid}/{photoId} {
+   allow read: if admin() || (request.auth != null && request.auth.uid == uid) || firestore.get(/databases/(default)/documents/photos/$(photoId)).data.status == 'approved';
+   allow create: if request.auth != null && request.auth.uid == uid && request.resource.size <= 5 * 1024 * 1024 && request.resource.contentType.matches('image/(jpeg|png|webp)');
+   allow update: if false;
+   allow delete: if admin() || (request.auth != null && request.auth.uid == uid);
+  }
+ }
+}
+
