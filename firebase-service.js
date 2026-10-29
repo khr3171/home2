@@ -2,7 +2,9 @@
 const MAX_BYTES = 102399; // Safely below 100 KiB, including base64 padding constraints.
 export function createRepository(sdk, database, currentUser) {
   const ref = path => path === undefined ? sdk.ref(database()) : sdk.ref(database(), path);
-  const rows = snapshot => { const list=[];snapshot.forEach(s=>list.push({...s.val(),id:s.key}));return list.sort((a,b)=>(b.createdAt-a.createdAt)||b.id.localeCompare(a.id)); };
+  // DataSnapshot.forEach stops when its callback returns a truthy value.
+  // Array.push returns the new length, so always use a callback with no return.
+  const rows = snapshot => { const list=[];snapshot.forEach(s=>{list.push({...s.val(),id:s.key});});return list.sort((a,b)=>(b.createdAt-a.createdAt)||b.id.localeCompare(a.id)); };
   const read = async q => rows(await sdk.get(q));
   return {
     async photoPage(cursor=null) {
