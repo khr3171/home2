@@ -81,7 +81,7 @@ export async function connect(config) {
   const repository=createRepository(d,()=>d.getDatabase(admin.currentUser?adminApp:visitorApp),currentUser);
   return {...repository,ensureUser,
     onUser:cb=>{const notify=()=>cb(currentUser());const off1=a.onAuthStateChanged(visitor,notify),off2=a.onAuthStateChanged(admin,notify);return()=>{off1();off2();};},
-    isAdmin:async u=>(await u.getIdTokenResult()).claims.admin===true,
+    isAdmin:async u=>!!u && (await d.get(d.ref(d.getDatabase(admin.currentUser?adminApp:visitorApp),`admins/${u.uid}`))).val()===true,
     login:(email,password)=>a.signInWithEmailAndPassword(admin,email,password),
     logout:()=>a.signOut(admin)
   };

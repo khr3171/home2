@@ -1,5 +1,3 @@
-> 2026-10-29 연결 설정 갱신: 사용자 제공 웹 앱 구성값과 databaseURL을 입력했고 enabled: true로 변경했습니다. 아래의 구성값 미입력·연습 모드 설명은 갱신 전 안내입니다. 새 규칙 게시와 실제 등록 검증은 별도로 필요합니다.
-
 # 한걸음의 진심 — Firebase Spark 전용 수정본
 
 ## 현재 구현
@@ -21,7 +19,7 @@
 먼저 「다음 할 일.md」를 확인하세요.
 site-config.js의 databaseURL은 사용자 제공 주소로 입력했습니다.
 https://home2-87a22-default-rtdb.firebaseio.com/
-현재 다른 웹 앱 구성값은 비어 있으며 enabled: false이므로 연습 모드입니다.
+웹 앱 구성값과 databaseURL이 입력되어 있으며 enabled: true입니다.
 연결 설정 오류 시 실제 운영 등록 버튼을 비활성화합니다. 운영 오류를 연습 저장 성공으로 처리하지 않습니다.
 
 firebase.json에는 database.rules.json만 지정합니다.
@@ -30,13 +28,12 @@ Firebase CLI로 규칙을 배포한다면 프로젝트를 선택한 뒤:
 
     firebase deploy --only database
 
-관리자는 신뢰할 수 있는 서버 환경에서 Firebase Admin SDK로 부여합니다:
-
-    await getAuth().setCustomUserClaims('관리자_UID', { admin: true });
-
-이 코드는 홈페이지 브라우저 코드에 넣지 마세요. 관리자 로그인 후에도 권한이 없으면 로그아웃 후 다시 로그인하세요.
+관리자는 Firebase 콘솔에서 admins/{UID} 값을 불리언 true로 등록합니다.
+「관리자 설정 안내.md」의 순서대로 새 규칙 게시, UID 등록, 홈페이지 배포를 진행하세요.
+클라이언트는 admins를 수정할 수 없으며 자신의 권한 여부만 읽습니다. 커스텀 클레임은 사용하지 않습니다.
 
 ## 저장 구조
+- admins/{UID}: true (Firebase 콘솔에서만 관리)
 - galleryMeta/p00~p99: uid, title, createdAt, uploadId
 - galleryImages/p00~p99: uid, uploadId, mime, base64
 - galleryDeleteTokens/p00~p99: 관리자 삭제 시 사용하는 마지막 uploadId (최대 100개 작은 문자열)
@@ -65,7 +62,7 @@ Firebase 설정값을 바꾸면 site-config.js를 GitHub에 올려 재배포하�
 
 ## 검증 범위
 JavaScript 구문, 정적 빌드를 검사했습니다.
-로컬 권한 표현식 점검 34개: 공개/비공개 조회, 관리자 답변, 본인 위조, 사진 수·크기 제한, 동시 업로드 덮어쓰기 차단, 원자 삭제, 오래된 삭제 요청 차단.
+로컬 권한 표현식 점검 40개: 공개/비공개 조회, 관리자 답변, 본인 위조, 사진 수·크기 제한, 동시 업로드 덮어쓰기 차단, 원자 삭제, 오래된 삭제 요청 차단.
 SDK/Canvas 모의 테스트: 100장 초과, 슬롯 경쟁 재시도, 12장 쿼리, 공개 기본값, 비공개 전달, 압축 크기·형식 전환·실패 처리.
 실제 Firebase Emulator 및 실제 프로젝트 연결 테스트는 아직 하지 않았습니다. 현재 환경에서 브라우저 로컬 미리보기 접근이 되지 않아 실제 화면·사진 압축의 시각 확인도 완료 전입니다.
 운영 전 두 브라우저/이용자와 관리자 계정으로 등록, 비공개 격리, 답변, 12장씩 보기, 삭제를 확인하세요.
