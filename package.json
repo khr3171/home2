@@ -1,2 +1,10 @@
-{"name":"hangeoreum-website","private":true,"type":"module","scripts":{"dev":"node server.mjs","check":"node --check app.js && node --check firebase-service.js && node --check site-config.js"}}
-
+{
+  "name": "hangeoreum-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "check": "node --check app.js && node --check firebase-service.js && node --check site-config.js",
+    "build": "node build.mjs"
+  }
+}

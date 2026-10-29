@@ -54,7 +54,7 @@ open이면서 HTTPS 주소가 있어야 실제 신청 링크가 나타납니다.
 
 1. Vercel에서 Add New → Project → GitHub 저장소를 가져오세요.
 2. Framework Preset: Other, Root Directory: 이 파일들이 있는 디렉터리
-3. Build Command: 비워 두기, Output Directory: 기본값(프로젝트 루트)
+3. Build Command: node build.mjs, Output Directory: dist (vercel.json에 설정됨)
 4. Deploy를 누르세요. 이후 GitHub main 변경분을 자동 배포할 수 있습니다.
 
 ## 6. Firebase 연결
@@ -117,3 +117,4 @@ Admin SDK 자격 증명은 이 홈페이지에 넣지 마세요. 관리자 지�
 JavaScript 구문 검사, 로컬 HTTP 응답과 주요 내부 링크·파일 연결을 확인합니다.
 이 작업 환경의 브라우저에서 로컬 서버 접근이 시간 초과되어 실제 화면과 클릭 동작의 브라우저 검증은 완료하지 못했습니다.
 운영 전 PC·휴대전화에서 글씨 확대, 메뉴, 문의 연습, 사진 미리보기, 키보드 이동을 확인하세요.
+
